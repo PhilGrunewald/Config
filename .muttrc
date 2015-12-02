@@ -2,14 +2,14 @@
 #
 macro index \\1 '<change-folder>imaps://imap.cenv0291.com<enter>'
 macro index \\2 '<change-folder>imaps://imap.strato.com<enter>'
-macro index \\3 '<change-folder>/users/pg1008/Documents/Mail/Strato/INBOX<enter>'
-macro index \\4 '<change-folder>/users/pg1008/Documents/Mail/cenv0291/INBOX<enter>'
+macro index \\3 '<change-folder>~/Documents/Mail/Strato/INBOX<enter>'
+macro index \\4 '<change-folder>~/Documents/Mail/cenv0291/INBOX<enter>'
 #macro index <f3> '<change-folder>imaps://imap.gmail.com<enter>'
 
 folder-hook 'cenv0291.com' 'source ~/.mutt/account.cenv0291'
 folder-hook 'strato.com' 'source ~/.mutt/account.strato'
-folder-hook '/users/pg1008/Documents/Mail/cenv0291/*' 'source ~/.mutt/account.cenv0291offline'
-folder-hook '/users/pg1008/Documents/Mail/Strato/*' 'source ~/.mutt/account.strato_offline'
+folder-hook '~/Documents/Mail/cenv0291/*' 'source ~/.mutt/account.cenv0291offline'
+folder-hook '~/Documents/Mail/Strato/*' 'source ~/.mutt/account.strato_offline'
 #
 # switch to default account on startup
 source ~/.mutt/account.cenv0291offline
@@ -25,8 +25,8 @@ set editor="vim -f +/^$ ++0"   # Use Vim to edit and start editing at first blan
 
 #set query_command = "~/.mutt/icloud-addressbook-query.py '%s'"
 #set query_command = "contacts -Sf '%eTOKEN%n' '%s' | sed -e 's/TOKEN/\t/g'"
-#set query_command = "less ~/.mutt/addresses | grep '%s'"
-set query_command = "less ~/.mutt/aliases | grep '%s'"
+set query_command = "less ~/.mutt/addresses | grep '%s'"
+#set query_command = "less ~/.mutt/aliases | grep '%s'"
 
 bind editor <Tab> complete-query
 bind editor ^T    complete
