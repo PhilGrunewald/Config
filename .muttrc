@@ -1,0 +1,152 @@
+# Phil's muttrc
+#
+macro index \\1 '<change-folder>imaps://imap.cenv0291.com<enter>'
+macro index \\2 '<change-folder>imaps://imap.strato.com<enter>'
+macro index \\3 '<change-folder>/users/pg1008/Documents/Mail/Strato/INBOX<enter>'
+macro index \\4 '<change-folder>/users/pg1008/Documents/Mail/cenv0291/INBOX<enter>'
+#macro index <f3> '<change-folder>imaps://imap.gmail.com<enter>'
+
+folder-hook 'cenv0291.com' 'source ~/.mutt/account.cenv0291'
+folder-hook 'strato.com' 'source ~/.mutt/account.strato'
+folder-hook '/users/pg1008/Documents/Mail/cenv0291/*' 'source ~/.mutt/account.cenv0291offline'
+folder-hook '/users/pg1008/Documents/Mail/Strato/*' 'source ~/.mutt/account.strato_offline'
+#
+# switch to default account on startup
+source ~/.mutt/account.cenv0291offline
+#
+# load aliases
+source ~/.mutt/aliases
+
+# hooks for saving messages to the right folder (based on email address)
+source ~/.mutt/hooks.mail
+
+
+set editor="vim -f +/^$ ++0"   # Use Vim to edit and start editing at first blank
+
+#set query_command = "~/.mutt/icloud-addressbook-query.py '%s'"
+#set query_command = "contacts -Sf '%eTOKEN%n' '%s' | sed -e 's/TOKEN/\t/g'"
+#set query_command = "less ~/.mutt/addresses | grep '%s'"
+set query_command = "less ~/.mutt/aliases | grep '%s'"
+
+bind editor <Tab> complete-query
+bind editor ^T    complete
+
+set edit_headers=yes        # Allow me to edit headers.
+set fast_reply=yes 
+set wait_key=no
+
+set imap_check_subscribed
+set mail_check = 10
+set timeout = 10
+set imap_keepalive = 300
+set header_cache=~/.mutt/cache/headers
+set message_cachedir=~/.mutt/cache/bodies
+set certificate_file=~/.mutt/certificates
+set alias_file=~/.mutt/aliases
+set move = no
+set include
+set delete = yes				# when syncing, delete messages without asking
+set confirmappend = no 			# don't ask before saving message to existing folder
+set recall = no 				# don't ask to continue postponed message
+set quit=ask-yes
+set narrow_tree					# tighter threading layout
+set mime_forward = no			# yes=forward all (incl text) as attachment. Better: v, tag all (body+attachments), f
+set text_flowed=no				# CHANGED - did silly line merging while tying - was to don't linebreak messages
+set indent_string = ''		# sadly mutt still uses "> "
+set auto_tag					# no need to start witn ';' when anything is tagged next command will apply to tagged messages
+unset mark_old					# keep all unread messages as 'new' (rather than 'old')
+
+# Key Bindings ------------------------------------------------------------------
+#bind index 			gg		first-entry
+macro index			gg		"<sync-mailbox><first-entry><shell-escape>offlineimap -q -u quiet<enter>"
+macro index			M		"<shell-escape>mvim ~/Documents/Text/Mail/temp.mail<enter>"
+bind index,attach	G		last-entry
+bind attach 		gg		first-entry
+macro pager 		gg		"i<first-entry><enter>"
+macro pager 		G		"i<last-entry><enter>"
+bind index,pager 	R		group-reply
+bind index 			<space>	collapse-all
+bind attach 		<space>	collapse-parts
+bind pager 			[		half-up
+bind pager 			]		half-down
+
+
+# Calendar
+	macro index,pager C "<enter-command>set editor='/usr/local/bin/calmutt '<enter><edit><enter-command>set editor='vim -f +/^$'<enter>" "Append label"
+
+# X-Labels
+	macro index,pager y "<enter-command>set editor='/usr/local/bin/editlabel'<enter><edit><enter-command>set editor='vim -f +/^$'<enter><previous-unread><mark-as-new><sync-mailbox><enter>" "Append label"
+
+	macro index,pager Y "<change-folder>~/Documents/Mail/results<return><shell-escape>mu index -m ~/Documents/Mail<enter><shell-escape>/usr/local/bin/editlabel find<enter>" "filter label"
+
+# Mu
+ # change to results folder and promt for search
+ # mufind is a wrapper I wrote in /usr/local/bin
+ macro index \\/ "<change-folder-readonly>~/Documents/Mail/results<return><shell-escape>mufind " \
+                  "mu find"
+
+macro index,pager 	V		"<enter-command>set editor='mvim -f +/^$ ++0'<enter><edit><enter-command>set editor=vim<enter>" "Edit with MacVim"
+macro index,pager 	\cv		"<enter-command>set editor='vim -f +/^$'<enter>" 'Edit with vim'
+macro pager 		<UP>	"<enter-command>set pager_index_lines 	= 10<enter>"
+macro pager 		<DOWN>	"<enter-command>set pager_index_lines 	= 30<enter>"
+macro pager 		H		"<enter-command>unignore To Cc Date<enter>"
+
+macro pager 		\cb 	<pipe-entry>'urlview'<enter> 'Follow links with urlview'
+macro index 		\ca 	"T~d>1m !~F !~N<return>;s=Archive<return>"	#save 1 month old mail in Archive (unless flagged or unread)"
+
+# Folder shortcuts (where to save and change folders)
+
+source ~/.mutt/folders
+
+# INDEX configuration
+
+#set 'index_format="%4C %Z %{%b %d} %-15.15L (%4l) %s"'
+#set index_format		= '%4C [%Z] %{%d %b %H:%M  } %-25.25L (%?l?%4l&%4c?) %s'
+#set index_format="%4C %Z %{%b %d} %-15.15L %?M?(#%03M)&(%4l)? %?y?(%.20Y) ?%s"
+set index_format="%4C %Z %{ %d %b %H:%M  } %-15.15L %?M?(%1M)? %?y?[%.20Y] ?%s"
+#et index_format="%4C %Z %{%b %d} %-15.15L %?M?(%2M) %?y?(%.20Y) ?%s"
+set date_format			= "!%a, %b %d, %Y at %I:%M:%S%p %Z"
+set forward_format = "Fwd: %s"
+
+#set index_format="%4C %Z (%4l) %s"
+# C = message number
+# Z = flags
+# d = day of month
+# b = month ('Jan')
+#
+set auto_tag = yes
+set sort=reverse-threads
+set sort_aux=last-date-received
+#set sort_aux=date-received
+#ignore "Authentication-Results:"
+#ignore "DomainKey-Signature:"
+#ignore "DKIM-Signature:"
+
+# Set up preview pane for messages
+set pager_index_lines 	= 20 	# number of index lines to show
+set pager_context 		= 3     # number of context lines to show
+set pager_stop          = yes   # don't go to next message automatically
+set menu_scroll         = yes   # scroll in menus
+set tilde               = yes   # show tildes like in vim
+set markers             = no 	# no ugly plus signs
+
+# PAGER configuration
+ignore *
+unignore From Subject
+hdr_order From Subject
+#unhdr_order *
+#hdr_order Date From To Cc
+
+# HTML view
+# uses
+# text/html; 		~/.mutt/safari_wrapper %s;  copiousoutput;
+# my preferred option would be
+# A) preview mail in pager with links
+# B) when opening via the 'v' dialog, use wrapper> Browser
+#
+alternative_order  text/enriched text/plain text/html *
+auto_view text/html
+#set implicit_autoview
+bind editor <space> noop 
+
+source ~/.mutt/colour			# Colour settings
